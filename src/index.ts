@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * asa — Amazon Scraper API CLI.
+ * asa - Amazon Scraper API CLI.
  *
  * Usage:
  *   asa product B09HN3Q81F             # scrape one product
@@ -12,14 +12,14 @@
  *   - ASA_API_KEY environment variable (preferred)
  *   - ~/.asa/credentials (stores via `asa auth login`)
  *
- * Minimal by design — heavy lifting stays in the SDK.
+ * Minimal by design - heavy lifting stays in the SDK.
  */
 import { AmazonScraperAPI } from 'amazon-scraper-api-sdk';
 import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
-const VERSION = '0.1.0';
+const VERSION = '0.1.3';
 
 function loadApiKey(): string | null {
   if (process.env.ASA_API_KEY) return process.env.ASA_API_KEY;
@@ -34,7 +34,7 @@ function loadApiKey(): string | null {
 }
 
 function usage(): never {
-  console.log(`asa v${VERSION} — Amazon Scraper API CLI
+  console.log(`asa v${VERSION} - Amazon Scraper API CLI
 
 Usage:
   asa product <ASIN> [--domain com|de|co.uk|...] [--language en_US|de_DE|...] [--json]
