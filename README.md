@@ -4,7 +4,19 @@
 [![npm downloads](https://img.shields.io/npm/dm/amazon-scraper-api-cli)](https://www.npmjs.com/package/amazon-scraper-api-cli)
 [![license](https://img.shields.io/npm/l/amazon-scraper-api-cli)](./LICENSE)
 
-Command-line interface for **[Amazon Scraper API](https://amazonscraperapi.com)** — scrape Amazon products, searches, and submit async batches straight from your terminal.
+Command-line interface for **[Amazon Scraper API](https://www.amazonscraperapi.com/)**. Scrape Amazon products, searches, and submit async batches straight from your terminal. Structured JSON to stdout, errors to stderr, pipes cleanly into `jq` / shell scripts / ndjson pipelines.
+
+## Benchmark (live production, 2026-04)
+
+| Metric | Value |
+|---|---|
+| Median latency (product, US) | **~2.6 s** |
+| P95 latency | **~6 s** |
+| Price / 1,000 Amazon products | **$0.50** flat |
+| Marketplaces supported | **20+** |
+| Billing unit | per successful (2xx) response |
+
+---
 
 ## Install
 
@@ -16,7 +28,7 @@ npm install -g amazon-scraper-api-cli
 npx amazon-scraper-api-cli product B09HN3Q81F
 ```
 
-Requires Node ≥ 18.
+Requires Node >= 18.
 
 ## Auth
 
@@ -31,7 +43,7 @@ mkdir -p ~/.asa
 echo "api_key=asa_live_..." > ~/.asa/credentials
 ```
 
-Get a key at https://app.amazonscraperapi.com — **1,000 free requests on signup**.
+Get a key at https://app.amazonscraperapi.com. **1,000 free requests on signup, no credit card required.**
 
 ## Quick tour
 
@@ -81,7 +93,7 @@ asa batch-status <BATCH_ID>
 asa product B09HN3Q81F | jq -r '.price.current'
 
 # Title + rating
-asa product B09HN3Q81F | jq -r '"\(.title) — \(.rating.average)★ (\(.rating.count) reviews)"'
+asa product B09HN3Q81F | jq -r '"\(.title) - \(.rating.average) stars (\(.rating.count) reviews)"'
 
 # Top 10 ASINs for a search
 asa search "wireless keyboard" --domain com | jq -r '.results[].asin'
@@ -94,7 +106,7 @@ while read asin; do asa product "$asin" --domain com; done < asins.txt > product
 
 | Flag | Commands | Description |
 |---|---|---|
-| `--domain` | product, search | Marketplace TLD (`com`, `co.uk`, `de`, `fr`, `co.jp`, `com.br`, ...) |
+| `--domain` | product, search | Marketplace TLD (`com`, `co.uk`, `de`, `fr`, `co.jp`, `com.br`, etc.) |
 | `--language` | product | Content-language header (e.g. `en_US`, `de_DE`) |
 | `--sort` | search | `best_match` \| `price_asc` \| `price_desc` \| `avg_customer_review` \| `newest` |
 | `--endpoint` | batch | `amazon.product` (default) or `amazon.search` |
@@ -109,22 +121,13 @@ while read asin; do asa product "$asin" --domain com; done < asins.txt > product
 
 Stdout is **always machine-readable JSON** on success. Errors on stderr. Safe to pipe into any script.
 
-## Benchmark (live production, 2026-04)
-
-| Metric | Ours | ScrapingBee $49 tier | ScraperAPI $49 tier |
-|---|---|---|---|
-| Median latency (product, US) | **~2.6 s** | ~3.3 s | n/a |
-| P95 latency | **~6 s** | ~22 s | n/a |
-| Price / 1,000 Amazon products | **$0.50** | $1.63 | $12.25 |
-| Concurrent threads (entry paid) | **50** | 10 | 20 |
-
 ## What the CLI handles for you
 
 | Pain | Solved |
 |---|---|
 | Amazon CAPTCHA/robot pages | Auto-retried through residential tier |
-| Brittle selectors in old OSS CLIs | Server-side extractors updated as layouts change |
-| Setting up proxies locally | None needed — it's an API call |
+| Stale selector maintenance | Server-side extractors updated as Amazon layouts change |
+| Setting up proxies locally | None needed. It's just an API call. |
 | Parsing Amazon HTML manually | Structured JSON output |
 | 20+ marketplaces | Same CLI, different `--domain` |
 
@@ -146,10 +149,11 @@ Common codes: `INVALID_API_KEY`, `INSUFFICIENT_CREDITS`, `RATE_LIMITED`, `target
 
 ## Get an API key
 
-[app.amazonscraperapi.com](https://app.amazonscraperapi.com) — **1,000 free requests on signup, no credit card required.**
+[app.amazonscraperapi.com](https://app.amazonscraperapi.com). **1,000 free requests on signup, no credit card required.**
 
 ## Links
 
+- **Website:** https://www.amazonscraperapi.com/
 - **Docs:** https://amazonscraperapi.com/docs
 - **Status:** https://amazonscraperapi.com/status
 - **Pricing:** https://amazonscraperapi.com/pricing

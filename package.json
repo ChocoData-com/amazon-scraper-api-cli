@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Command-line interface for Amazon Scraper API — scrape products directly from your terminal",
   "keywords": [
     "amazon",
@@ -36,7 +36,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "amazon-scraper-api-sdk": "^0.1.1"
+    "amazon-scraper-api-sdk": "^0.1.2"
   },
   "devDependencies": {
     "typescript": "^5.4.0"
