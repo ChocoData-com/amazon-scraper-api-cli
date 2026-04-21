@@ -1,0 +1,44 @@
+{
+  "name": "amazon-scraper-api-cli",
+  "publishConfig": {
+    "access": "public"
+  },
+  "version": "0.1.1",
+  "description": "Command-line interface for Amazon Scraper API — scrape products directly from your terminal",
+  "keywords": [
+    "amazon",
+    "scraper",
+    "cli",
+    "product-data"
+  ],
+  "license": "MIT",
+  "author": "Amazon Scraper API",
+  "homepage": "https://amazonscraperapi.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChocoData-com/amazon-scraper-api-cli.git"
+  },
+  "bugs": "https://github.com/ChocoData-com/amazon-scraper-api-cli/issues",
+  "type": "module",
+  "bin": {
+    "asa": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && chmod +x dist/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "amazon-scraper-api-sdk": "^0.1.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
