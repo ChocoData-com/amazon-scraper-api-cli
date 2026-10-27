@@ -54,8 +54,9 @@ asa product B09HN3Q81F
 # Specific marketplace + language
 asa product B000ALVUM6 --domain de --language de_DE
 
-# Keyword search with sort
+# Keyword search with sort, then page 2
 asa search "cast iron skillet" --domain com --sort avg_customer_review
+asa search "cast iron skillet" --domain com --page 2
 
 # Batch submit (up to 1,000 items)
 cat <<EOF > batch.json
@@ -70,36 +71,40 @@ asa batch batch.json --webhook https://your.server/webhooks/asa
 asa batch-status <BATCH_ID>
 ```
 
-## Example output
+## Example output (trimmed, ~55 fields in total)
 
 ```json
 {
   "asin": "B09HN3Q81F",
-  "title": "Apple AirPods Pro (2nd Generation)...",
-  "price": { "current": 199.00, "currency": "USD", "was": 249.00 },
-  "rating": { "average": 4.7, "count": 58214 },
-  "availability": "In Stock",
-  "buybox": { "seller": "Amazon.com", "prime": true },
-  "images": ["https://m.media-amazon.com/images/I/...jpg"],
-  "bullets": ["Active Noise Cancellation...", "Adaptive Audio..."],
-  "_meta": { "tier": "direct", "duration_ms": 2634 }
+  "title": "LEGEND COOKWARE 5-Ply Stainless Steel Cookware Set, 14-Piece...",
+  "brand": "LEGEND COOKWARE",
+  "price": 549.99,
+  "currency": "USD",
+  "rating": 4.5,
+  "reviews_count": 865,
+  "stock": "In Stock",
+  "is_prime": true,
+  "images": ["https://m.media-amazon.com/images/I/71Q3a8JH5NL._AC_SY355_.jpg", "..."],
+  "bullet_points": "5-PLY STAINLESS STEEL COOKWARE HEATS EVENLY - Five layers of steel..."
 }
 ```
+
+Search returns `{ "page": 1, "products": [ ... ] }`, one card per result with `asin`, `title`, `price`, `rating`, `reviews_count`, `organic_position` (or `sponsored_position`) and more.
 
 ## Piping to jq (one-liners)
 
 ```bash
 # Just the price
-asa product B09HN3Q81F | jq -r '.price.current'
+asa product B09HN3Q81F | jq -r '.price'
 
 # Title + rating
-asa product B09HN3Q81F | jq -r '"\(.title) - \(.rating.average) stars (\(.rating.count) reviews)"'
+asa product B09HN3Q81F | jq -r '"\(.title) - \(.rating) stars (\(.reviews_count) reviews)"'
 
-# Top 10 ASINs for a search
-asa search "wireless keyboard" --domain com | jq -r '.results[].asin'
+# ASINs from a search page
+asa search "wireless keyboard" --domain com | jq -r '.products[].asin'
 
-# Bulk fetch a list of ASINs
-while read asin; do asa product "$asin" --domain com; done < asins.txt > products.ndjson
+# Bulk fetch a list of ASINs into NDJSON (one object per line)
+while read asin; do asa product "$asin" --domain com | jq -c .; done < asins.txt > products.ndjson
 ```
 
 ## Flags
@@ -109,6 +114,7 @@ while read asin; do asa product "$asin" --domain com; done < asins.txt > product
 | `--domain` | product, search | Marketplace TLD (`com`, `co.uk`, `de`, `fr`, `co.jp`, `com.br`, etc.) |
 | `--language` | product | Content-language header (e.g. `en_US`, `de_DE`) |
 | `--sort` | search | `best_match` \| `price_asc` \| `price_desc` \| `avg_customer_review` \| `newest` |
+| `--page` | search | Results page to fetch, 1-based (default 1) |
 | `--endpoint` | batch | `amazon.product` (default) or `amazon.search` |
 | `--webhook` | batch | HTTPS URL to POST batch results to when complete |
 

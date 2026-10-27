@@ -5,12 +5,12 @@
  * Usage:
  *   asa product B09HN3Q81F             # scrape one product
  *   asa product B09HN3Q81F --domain de # specific marketplace
- *   asa search "wireless headphones"   # keyword search
+ *   asa search "wireless headphones"   # keyword search (--page N to paginate)
  *   asa batch items.json               # batch submit from a local file
  *
  * Auth: reads API key from:
  *   - ASA_API_KEY environment variable (preferred)
- *   - ~/.asa/credentials (stores via `asa auth login`)
+ *   - ~/.asa/credentials (a file containing `api_key=asa_live_...`)
  *
  * Minimal by design - heavy lifting stays in the SDK.
  */
@@ -19,7 +19,7 @@ import { readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 
-const VERSION = '0.1.3';
+const VERSION = '0.1.6';
 
 function loadApiKey(): string | null {
   if (process.env.ASA_API_KEY) return process.env.ASA_API_KEY;
@@ -37,17 +37,19 @@ function usage(): never {
   console.log(`asa v${VERSION} - Amazon Scraper API CLI
 
 Usage:
-  asa product <ASIN> [--domain com|de|co.uk|...] [--language en_US|de_DE|...] [--json]
-  asa search <QUERY> [--domain com] [--sort best_match|price_asc|price_desc|avg_customer_review|newest]
-  asa batch <FILE.json> [--webhook https://...]
+  asa product <ASIN> [--domain com|de|co.uk|...] [--language en_US|de_DE|...]
+  asa search <QUERY> [--domain com] [--sort best_match|price_asc|price_desc|avg_customer_review|newest] [--page N]
+  asa batch <FILE.json> [--endpoint amazon.product|amazon.search] [--webhook https://...]
   asa batch-status <BATCH_ID>
   asa --version
+
+Output is JSON on stdout; errors go to stderr with exit code 1.
 
 Auth (set ONE of these):
   ASA_API_KEY=asa_live_...  (env var, preferred)
   ~/.asa/credentials        (file format: api_key=asa_live_...)
 
-Docs: https://app.amazonscraperapi.com/docs`);
+Docs: https://amazonscraperapi.com/docs`);
   process.exit(0);
 }
 
@@ -95,6 +97,7 @@ async function main() {
           query: q,
           domain: (arg('--domain') ?? 'com') as any,
           sort_by: arg('--sort') as any,
+          start_page: arg('--page') ? Number(arg('--page')) : undefined,
         });
         console.log(JSON.stringify(r, null, 2));
         break;
