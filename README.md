@@ -135,17 +135,22 @@ Stdout is **always machine-readable JSON** on success. Errors on stderr. Safe to
 
 ## Error handling
 
-Errors are JSON to stderr with a stable `error.code`:
+On failure the CLI prints `error: HTTP <status>: <code>` to stderr, followed by the API's JSON error body, and exits with `1`:
 
 ```bash
 $ asa product INVALID_ASIN --domain com
-error: INVALID_PARAMS
-{"error":{"code":"INVALID_PARAMS","message":"query must be a 10-character ASIN or an Amazon URL","hint":"Pass ?query=B09HN3Q81F or https://www.amazon.com/dp/B09HN3Q81F"}}
+error: HTTP 400: invalid_params
+{
+  "error": "invalid_params",
+  "issues": [
+    { "code": "invalid_string", "message": "ASIN must be 10 alphanumeric chars", "path": ["query"] }
+  ]
+}
 $ echo $?
 1
 ```
 
-Common codes: `INVALID_API_KEY`, `INSUFFICIENT_CREDITS`, `RATE_LIMITED`, `target_unreachable`, `amazon-robot-or-human`, `extraction_failed`. Non-2xx responses are **not charged**. `X-Request-Id` header is surfaced in error output for support tickets.
+Common codes: `INVALID_API_KEY`, `INSUFFICIENT_CREDITS`, `RATE_LIMITED`, `CONCURRENCY_LIMIT`, `product_not_found`, `target_unreachable` (retry after 60s or more), `extraction_failed`. Non-2xx responses are **not charged**. For support, send the time and ASIN of the failed call.
 
 ## Get an API key
 
@@ -155,7 +160,6 @@ Common codes: `INVALID_API_KEY`, `INSUFFICIENT_CREDITS`, `RATE_LIMITED`, `target
 
 - **Website:** https://www.amazonscraperapi.com/
 - **Docs:** https://amazonscraperapi.com/docs
-- **Status:** https://amazonscraperapi.com/status
 - **Pricing:** https://amazonscraperapi.com/pricing
 - **Node SDK:** [amazon-scraper-api-sdk](https://www.npmjs.com/package/amazon-scraper-api-sdk) · **Python SDK:** [amazonscraperapi-sdk](https://pypi.org/project/amazonscraperapi-sdk/) · **Go SDK:** [github.com/ChocoData-com/amazon-scraper-api-sdk-go](https://github.com/ChocoData-com/amazon-scraper-api-sdk-go) · **MCP server:** [amazon-scraper-api-mcp](https://www.npmjs.com/package/amazon-scraper-api-mcp)
 
